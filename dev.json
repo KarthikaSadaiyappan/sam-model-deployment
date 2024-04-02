@@ -1,0 +1,5 @@
+{
+    "Parameters": {
+        "endpointname":"return-prediction-xgboost-model-endpoint"
+    }
+}

@@ -1,0 +1,123 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+Description: An AWS Serverless Specification template for return prediction
+
+Parameters:
+  RoleArn:
+    Type: String
+    Description: SageMaker Execution IAM Role
+    Default: arn:aws:iam::058264492218:role/service-role/AmazonSageMaker-ExecutionRole-20240325T122402
+  
+  ImageURI:
+    Type: String
+    Description: The inference/container image 
+    Default: 811284229777.dkr.ecr.us-east-1.amazonaws.com/xgboost:latest
+
+  ModelData:
+    Type: String
+    Description: The S3 Path with the Model Data
+    Default: s3://retail-return-predictor-bucket/xgboost-model/output/xgboost-2024-03-26-14-58-27-729/output/model.tar.gz
+
+  Modelname:
+    Type: String
+    Description: Name of the deployable model
+    Default: return-prediction-xgboost-model  
+
+  InstanceType:
+    Type: String
+    Description: SageMaker Endpoint Instance Type
+    Default: ml.m4.xlarge
+  
+  InstanceCount:
+    Type: String
+    Description: Number of instances behind endpoint
+    Default: 1
+
+  EndpointConfigname:
+    Type: String
+    Description: Name of the endpoint configuration
+    Default: return-prediction-xgboost-model-endpointconfig
+
+  Endpointname:
+    Type: String
+    Description: Name of the endpoint 
+    Default: return-prediction-xgboost-model-endpoint
+
+
+Resources:
+
+  PredictionApi:
+    Type: AWS::Serverless::Api
+    Properties:
+      StageName: dev
+
+  PredictionFunction:
+    Type: AWS::Serverless::Function
+    Properties:
+      CodeUri: lambda/
+      Handler: app.lambda_handler
+      Runtime: python3.9
+      Environment:
+        Variables:
+          ENDPOINT_NAME: !Ref Endpointname
+      Policies:
+        - AmazonS3FullAccess
+        - AmazonSageMakerFullAccess
+        
+      Events:
+        ApiEvent:
+          Type: Api
+          Properties:
+            Path: /prediction
+            Method: post
+            RestApiId: 
+              Ref: PredictionApi
+
+
+  SageMakerModel:
+    Type: AWS::SageMaker::Model
+    Properties: 
+      Containers: 
+        -
+          Image: !Ref ImageURI
+          ModelDataUrl: !Ref ModelData
+          Mode: SingleModel #This defaults to single model change to "MultiModel" for MME
+          # Environment: {"SAGEMAKER_PROGRAM": "inference.py", "SAGEMAKER_SUBMIT_DIRECTORY": !Ref ModelData}
+      ExecutionRoleArn: !Ref RoleArn
+      ModelName: !Ref Modelname
+
+  SageMakerEndpointConfig:
+    Type: "AWS::SageMaker::EndpointConfig"
+    Properties:
+      EndpointConfigName: !Ref EndpointConfigname
+      ProductionVariants: 
+        -
+          ModelName: !GetAtt SageMakerModel.ModelName
+          VariantName: xgboost-model
+          InitialInstanceCount: !Ref InstanceCount
+          InstanceType: !Ref InstanceType
+          InitialVariantWeight: 1.0
+
+  SageMakerEndpoint:
+    Type: "AWS::SageMaker::Endpoint"
+    Properties: 
+      EndpointName: !Ref Endpointname
+      EndpointConfigName: !GetAtt SageMakerEndpointConfig.EndpointConfigName
+
+Outputs:
+  ReturnPredictionModel:
+    Description: export return prediction model
+    Value: !Ref SageMakerModel
+    Export:
+      Name: 'ReturnPredictionModel'  
+  ReturnPredictionEndpointConfig:
+    Description: export return prediction endpointconfig
+    Value: !Ref SageMakerEndpointConfig
+    Export:
+      Name: 'ReturnPredictionEndpointConfig'  
+  ReturnPredictionEndpoint:
+    Description: export return prediction endpoint
+    Value: !Ref SageMakerEndpoint
+    Export:
+      Name: 'ReturnPredictionEndpoint'  
+    
