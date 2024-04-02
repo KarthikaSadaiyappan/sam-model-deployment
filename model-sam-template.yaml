@@ -41,7 +41,7 @@ Parameters:
   Endpointname:
     Type: String
     Description: Name of the endpoint 
-    Default: return-prediction-xgboost-model-endpoint
+    
 
 
 Resources:

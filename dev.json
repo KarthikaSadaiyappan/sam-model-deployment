@@ -1,5 +1,5 @@
 {
     "Parameters": {
-        "endpointname":"return-prediction-xgboost-model-endpoint"
+        "Endpointname":"return-prediction-xgboost-model-endpoint"
     }
 }
