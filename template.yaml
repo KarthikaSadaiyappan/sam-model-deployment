@@ -26,12 +26,7 @@ Parameters:
   InstanceType:
     Type: String
     Description: SageMaker Endpoint Instance Type
-    Default: ml.m4.xlarge
-  
-  InstanceCount:
-    Type: String
-    Description: Number of instances behind endpoint
-    Default: 1
+    Default: ml.m4.xlarge  
 
   EndpointConfigname:
     Type: String
@@ -94,7 +89,7 @@ Resources:
         -
           ModelName: !GetAtt SageMakerModel.ModelName
           VariantName: xgboost-model
-          InitialInstanceCount: !Ref InstanceCount
+          InitialInstanceCount: 1
           InstanceType: !Ref InstanceType
           InitialVariantWeight: 1.0
 
