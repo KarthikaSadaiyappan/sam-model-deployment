@@ -16,7 +16,6 @@ Parameters:
   ModelData:
     Type: String
     Description: The S3 Path with the Model Data
-    Default: s3://retail-return-predictor-bucket/xgboost-model/output/xgboost-2024-03-26-14-58-27-729/output/model.tar.gz
 
   Modelname:
     Type: String
@@ -26,7 +25,6 @@ Parameters:
   InstanceType:
     Type: String
     Description: SageMaker Endpoint Instance Type
-    Default: ml.m4.xlarge  
 
   EndpointConfigname:
     Type: String
@@ -93,11 +91,11 @@ Resources:
           InstanceType: !Ref InstanceType
           InitialVariantWeight: 1.0
 
-  SageMakerEndpoint:
-    Type: "AWS::SageMaker::Endpoint"
-    Properties: 
-      EndpointName: !Ref Endpointname
-      EndpointConfigName: !GetAtt SageMakerEndpointConfig.EndpointConfigName
+  # SageMakerEndpoint:
+  #   Type: "AWS::SageMaker::Endpoint"
+  #   Properties: 
+  #     EndpointName: !Ref Endpointname
+  #     EndpointConfigName: !GetAtt SageMakerEndpointConfig.EndpointConfigName
 
 Outputs:
   ReturnPredictionModel:
@@ -110,9 +108,9 @@ Outputs:
     Value: !Ref SageMakerEndpointConfig
     Export:
       Name: 'ReturnPredictionEndpointConfig'  
-  ReturnPredictionEndpoint:
-    Description: export return prediction endpoint
-    Value: !Ref SageMakerEndpoint
-    Export:
-      Name: 'ReturnPredictionEndpoint'  
+  # ReturnPredictionEndpoint:
+  #   Description: export return prediction endpoint
+  #   Value: !Ref SageMakerEndpoint
+  #   Export:
+  #     Name: 'ReturnPredictionEndpoint'  
     
