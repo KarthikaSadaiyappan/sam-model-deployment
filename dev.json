@@ -1,6 +1,7 @@
 {
     "Parameters": {
         "ModelData":"s3://retail-return-predictor-bucket/xgboost-model/output/xgboost-2024-03-26-14-58-27-729/output/model.tar.gz",
-        "InstanceType":"ml.m4.xlarge"
+        "InstanceType":"ml.m4.xlarge",
+        "Endpointname": "xgboost-returndprediction-endpoint"
     }
 }
