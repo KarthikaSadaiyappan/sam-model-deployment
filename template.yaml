@@ -75,8 +75,7 @@ Resources:
         -
           Image: !Ref ImageURI
           ModelDataUrl: !Ref ModelData
-          Mode: SingleModel #This defaults to single model change to "MultiModel" for MME
-          # Environment: {"SAGEMAKER_PROGRAM": "inference.py", "SAGEMAKER_SUBMIT_DIRECTORY": !Ref ModelData}
+          Mode: SingleModel 
       ExecutionRoleArn: !Ref RoleArn
       ModelName: !Ref Modelname
 
